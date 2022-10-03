@@ -54,7 +54,7 @@ On utiliser les attributs plutôt que les YAML. De la forme /controller/fonction
 
 Les templates sont des vues et ne contiennent pas des appels aux bases de données ou calculs, les templates sont normalement déjà ordonnées etc. Le reste, plus poussé est fait directement dans le container php
 
-Crud:1. https://symfony.com/doc/current/controller.html#generating-controllers
+[Symphony Doc Generating Controller - CRUD](https://symfony.com/doc/current/controller.html#generating-controllers)
 
 #### Databases
 Installer doctrine avec les commandes:
@@ -72,3 +72,6 @@ Notre db à déja été créer lors du build avec docker.
 
 >note: toutes les commandes doivent être faites dans le container php de docker
 
+#### Créer une entité
+
+[Symphony Doc Creating an Entity Class](https://symfony.com/doc/current/doctrine.html#creating-an-entity-class)
