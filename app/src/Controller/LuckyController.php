@@ -12,10 +12,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 #[Route('/lucky')]
 class LuckyController extends AbstractController
 {
-    #[Route('/number')]
-    public function number(): Response
+    #donner un nom à la route
+    #[Route('/number/{max}', name:"lucky_number_max")]
+    public function number(int $max): Response
     {
-        $number = random_int(0, 100);
+        #dd($max); #die and dump
+        if ($max<0){
+            $max=100;
+        }
+        $number = random_int(0, $max);
 
         return $this->render('lucky/number.html.twig', [
             'number' => $number,

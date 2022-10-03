@@ -26,7 +26,7 @@ class BlogApiController extends AbstractController
     {
         $number = random_int(0, 100);
 
-
+        #tableau de valeurs
         return $this->render('lucky/number.html.twig', [
             'number' => $number,
         ]);
