@@ -1,2 +1,5 @@
 mysql
-
+app/vendor
+app/var
+app/.env
+app/.env.test
