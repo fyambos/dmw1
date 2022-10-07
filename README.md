@@ -13,11 +13,11 @@ wsl --install -d Ubuntu-20.04
 On peut build docker à partir d'une url github.
 `docker build https://github.com/ldandoy/sf-dwm-23`
 
-Sinon on peut nous mêmes écrire les fichiers Dockerfile, docker-compose.yml, et créer les dossiers php, nginx, app et mysql.
+Sinon on peut nous mêmes écrire le docker-composer.yml et le placer dans le dossier du projet. Créer un dossier Php dans lequel on met le Dockerfile.
 `docker build php/Dockerfile`
 
 #### Run docker
-Ouvrir le fichier yml dans le terminal intégrer et faire la commande:
+Ouvrir le fichier yml dans le terminal intégré et faire la commande:
 ```bash
 docker-compose up -d
 ```
@@ -75,3 +75,24 @@ Notre db à déja été créer lors du build avec docker.
 #### Créer une entité
 
 [Symphony Doc Creating an Entity Class](https://symfony.com/doc/current/doctrine.html#creating-an-entity-class)
+
+Create the Entity (a table) and push it to the database with the command:
+
+```bash
+php bin/console make:migration
+```
+>note: toutes les commandes doivent être faites dans le container php de docker
+
+The previous command prepared the commit, to execute the commit, use the following command:
+```bash
+php bin/console doctrine:migrations:migrate
+```
+
+You can also use a php command to create an Entity instead of writing it yourself, which also includes the "namespace", "use" and setters and getters automatically:
+
+```bash
+php bin/console make:entity
+```
+>note: the property 'id' is also done automatically. the command also allows to edit an existing entity.
+
+`SQLSTATE[42S01]: Base table or view already exists: 1050 Table 'product' already exists`
