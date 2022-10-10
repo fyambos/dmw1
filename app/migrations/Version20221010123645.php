@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20221007202025 extends AbstractMigration
+final class Version20221010123645 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -21,13 +21,15 @@ final class Version20221007202025 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE TABLE books (id INT AUTO_INCREMENT NOT NULL, title VARCHAR(255) DEFAULT NULL, author VARCHAR(255) DEFAULT NULL, genre VARCHAR(1024) DEFAULT NULL, series INT DEFAULT NULL, price DOUBLE PRECISION DEFAULT NULL, available TINYINT(1) NOT NULL, rent_id INT DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('ALTER TABLE product ADD description LONGTEXT NOT NULL');
+        $this->addSql('CREATE TABLE ticket (id INT AUTO_INCREMENT NOT NULL, reporter VARCHAR(255) DEFAULT NULL, label VARCHAR(255) NOT NULL, summary VARCHAR(255) DEFAULT NULL, status VARCHAR(100) NOT NULL, assignee VARCHAR(255) DEFAULT NULL, created DATETIME NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('DROP TABLE product');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
+        $this->addSql('CREATE TABLE product (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) CHARACTER SET utf8mb4 NOT NULL COLLATE `utf8mb4_unicode_ci`, price INT NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB COMMENT = \'\' ');
         $this->addSql('DROP TABLE books');
-        $this->addSql('ALTER TABLE product DROP description');
+        $this->addSql('DROP TABLE ticket');
     }
 }
