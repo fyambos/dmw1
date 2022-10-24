@@ -25,6 +25,8 @@ class TicketController extends AbstractController
 
 
     /*
+    //faire un insert dans la db depuis doctrine
+    #[Route('/new', name: 'create_ticket')]
     public function createTicket(ManagerRegistry $doctrine): Response
     {
         $entityManager = $doctrine->getManager();

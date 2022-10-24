@@ -30,4 +30,3 @@ class LuckyController extends AbstractController
 
 
 
-?>
