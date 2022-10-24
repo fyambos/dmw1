@@ -5,6 +5,9 @@ namespace App\Entity;
 use App\Repository\TicketRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Type;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Entity(repositoryClass: TicketRepository::class)]
 class Ticket
@@ -107,5 +110,12 @@ class Ticket
         $this->created = $created;
 
         return $this;
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addPropertyConstraint('Label', new NotBlank());
+        $metadata->addPropertyConstraint('Reporter', new NotBlank());
+        $metadata->addPropertyConstraint('Summary', new NotBlank());
     }
 }

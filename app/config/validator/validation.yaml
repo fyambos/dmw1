@@ -1,0 +1,8 @@
+App\Entity\Ticket:
+    properties:
+        label:
+            - NotBlank: ~
+        summary:
+            - NotBlank: ~
+        reporter:
+            - NotBlank: ~

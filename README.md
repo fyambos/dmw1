@@ -158,7 +158,7 @@ class TicketController extends AbstractController
 }
 ```
 
-Dans notre classe Ticket Controller on peut spécifier la route de notre résultat:
+Dans notre classe TicketController on peut spécifier la route de notre résultat:
 ```php
 class TicketController extends AbstractController
 {
@@ -215,22 +215,296 @@ Ainsi, on va créer un dossier tickets et un fichier list.html.twig dans lequel 
 
 ### Insersion via doctrine
 Une insersion via doctrine consiste à **persister** un objet dans la base de donnée.
-Pour cela, on doit créer un nouveau controller dans lequel on va créer un objet Ticket avec les valeurs que l'on veut insérer.
+Pour cela, on doit ajouter une nouvelle fonction dans notre TicketController, afin de créer un objet Ticket avec les valeurs que l'on veut insérer.
 
-```bash
-php bin/console make:controller TicketController
+> note: ([Voir Symfony Doc](https://symfony.com/doc/current/doctrine.html#persisting-objects-to-the-database))
+
+Sous la fonction index(), créer la route pour créer un ticket
+
+```php
+    public function index(ManagerRegistry $doctrine): Response
+    {
+     //...
+    }
+    #[Route('/new', name: 'create_ticket')]
 ```
 
-Ajouter les imports:
+Sous la route on créer une fonction pour créer un ticket:
+```php
+public function createTicket(): Response
+    {
+    }
+```
+
+On a encore besoin de passer le ManagerRegistry en parametre:
+```php
+public function createTicket(ManagerRegistry $doctrine): Response
+```
+Cela va nous permettre d'utiliser la methode getManager() du ManagerRegistry.
+```php
+    //dans la fonction createTicket:
+        $entityManager = $doctrine->getManager();
+```
+On instancie un ticket, puis on utilise les setters pour affecter les valeurs
+```php
+        $product = new Product();
+        $product->setName('Keyboard');
+```
+
+### Ubuntu
+Si on déplace le dossier du projet vers Ubuntu, on aura besoin de changer les droits de var, qui sont associés à l'utilisateur, il faut donner les droits à www-data.
+```bash
+sudo chown www-data:www-data var -R
+```
+> note: Si on a une erreur de version, utiliser 3 au lieu de 3.8
+
+### Twig
+
+Dans le base.html.twig on a le stylesheet block et le javascript block. Ce sont les blocks dans lesquels on déposera les CSS et les scripts. Si ils étaient placés dans les twigs spécifiques aux Controllers (lucky, ticket, etc) alors ils overriderait ceux du base.html.twig. Ainsi, les fonctions `encore_entry_link_tags('app')` et `encore_entry_script_tags('app')`  ne seraient plus utilisée, le dernier sert notemment à afficher la barre symfony avec des info utiles en bas de la page.
+
+On peut importer le base.html.twig en faisant un extends dans nos templates.
+```js
+{% extends 'base.html.twig' %}
+```
+
+Une fois que on a extends d'une autre template, on ne peut pas ajouter du contenu sans le mettre dans une balise block.
+
+```js
+{% block body %}
+   //Some content//
+{% endblock %}
+```
+
+### Bootstrap
+
+Pour ajouter [Bootstrap](https://getbootstrap.com/docs/5.2/getting-started/introduction/) au projet, on ajoute la ligne
+```html
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+```
+
+À la fin du <head>.
+
+Puis:
+```html
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+```
+À la fin du <body>.
+
+On utilise Bootstrap dans nos templates twig, voir la [Documentation](https://getbootstrap.com/docs/4.1/getting-started/introduction/)
+
+>note: On peut utiliser Tailwind à la place de Bootstrap, qui nécéssite plus de configurations.
+
+### Formulaire
+
+#### Créer un formulaire
+
+Afin d'enregistrer dans la base de donnée, on réalise un formulaire que l'utilisateur rempli. Pour cela, utiliser le [Form Type](https://symfony.com/doc/current/forms.html).
+
+Dans la page d'acceuil, ajouter un bouton "Creer Ticket" qui redirige vers la page de formulaire. A l'issue de l'envoi du formulaire, le ticket est ajouté à la base s'il est conforme.
+
+Pour pouvoir utiliser Form Type il faut installer form.
+```php
+ composer require symfony/form
+```
+>rappel: commandes PHP à effectuer dans le contener php (dans le terminal docker)
+
+Créer le fichier scr/Form/Type/TicketType.php
+
+On créer une classe pour le formulaire de notre entité séparement du Controller pour avoir un TicketController propre, et avoir un un TicketType réutilisable.
+
+```php
+namespace App\Form\Type;
+use Symfony\Component\Form\AbstractType;
+
+class TicketType extends AbstractType {
+
+}
+```
+
+Dans la classe Ticket Type, on va créer une fonction buildForm. (Qui ne retourne rien).
+
+```php
+public function buildForm(): void {
+    }
+```
+
+Pour construire un formulaire on a besoin de la FormBuilderInterface.
+
+```php
+use Symfony\Component\Form\FormBuilderInterface;
+
+public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+    }
+```
+
+Dans la fonction buildForm on va donc utiliser le `$builder` et affecter les données provenant de `$options`.
+```php
+public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+            ->add('label', TextType::class)
+            ->add('status', TextType::class)
+            ->add('summary', TextType::class)
+            ->add('reporter', TextType::class)
+            ->add('assignee', TextType::class)
+            ->add('save', SubmitType::class)
+    }
+```
+
+On a besoin donc de use TextType et SubmitType. Ici tous nos champs sont des strings mais si on avait des int ou date on aurait besoin de DateType, NumberType, etc. Voir les [Field Types](https://symfony.com/doc/current/reference/forms/types.html#supported-field-types) supportés.
+
+>Note: Installer MakerBundle permet de generer des classes formulaire avec make:form et make:registration-form.
+
+#### Ajouter le formulaire au Controller
+
+Dans le TicketController, on va ajouter le TypeTicket
+```php
+use App\Form\Type\TicketType;
+```
+
+Puis on modifier la fonction createTicket. Au lieu de créer un ticket et de l'envoyer dans la base, on récupérer les données du formulaire dans un objet ticket et l'envoyer à la base.
+
+```php
+    $entityManager = $doctrine->getManager();
+    $ticket = new Ticket();
+    //créer le formulaire
+    $form = $this->createForm(TicketType::class, $ticket);
+```
+
+Le système de formulaire est suffisamment intelligent pour accéder à la valeur de la propriété protégée du ticket via les méthodes getTicket() et setTicket() de la classe Ticket. 
+
+Ensuite, on vérifie que l'utilisateur à bien rempli les champs. Si c'est le cas, on récupère les données du formulaire.
+```php
+if ($form->isSubmitted() && $form->isValid()) {
+    $ticket = $form->getData();
+    $ticket->setCreated(new \DateTime()); //format Y-m-d H:i:s
+}
+```
+
+#### Récupérer les données du formulaire
+
+Cependant, pour que on puisse récupérer les données, il faut récupérée la requete envoyée par le formulaire. 
+
+```php
+use Symfony\Component\HttpFoundation\Request;
+public function createTicket(Request $request, ManagerRegistry $doctrine): Response {
+    // ...
+}
+```
+Dans notre condition if, on va utiliser la fonction handleRequest sur le formulaire. Et *ensuite* on récupère les données.
+On peut aussi affecter des données nous même, exemple, la date.
+```php
+use Symfony\Component\HttpFoundation\Request;
+//...
+public function createTicket(Request $request, ManagerRegistry $doctrine): Response {
+    // ...
+    if ($form->isSubmitted() && $form->isValid()) {
+        $form->handleRequest($request);
+        $ticket = $form->getData();
+        $form = $this->createForm(TicketType::class, $ticket);
+    }
+}
+```
+
+#### Insérer les données du formulaire
+Si les champs sont bien remplis, on peut ajouter dans la base de données (même principe que le précédent createTicket()). Sinon, on ajoute pas dans la base de donnée et on redemande la complétion du formulaire.
+```php
+    if ($form->isSubmitted() && $form->isValid()) {
+        //... $entityManager;$ticket;$form
+        $form->handleRequest($request);
+        //... persist ticket and add ticket to database ...//
+        return $this->redirectToRoute('tickets_list');
+    }
+    return $this->renderForm('tickets/new.html.twig', [
+            'form' => $form,
+    ]);
+```
+#### Afficher le formulaire
+
+Enfin, on a besoin de créer le twig pour la page de formulaire.
+Il suffit de créer le fichier templates/tickets/new.html.twig et d'y ajouter:
+```js
+{{ form(form) }}
+```
+
+On peut aussi extends le base.html.twig et ajouter une balise titre, il faudra mettre le formulaire dans un block body.
+
+#### OptionResolver
+
+Il est de bonne pratique d'ajouter dans les Form Type l'entité dont il est question, et d'utiliser OptionsResolver pour specifier l'option `'data_class'`
 ```php
 use App\Entity\Ticket;
-use Doctrine\Persistence\ManagerRegistry;
-```
-Changer le nom de la route en "create_ticket":
+use Symfony\Component\OptionsResolver\OptionsResolver;
+    // ...
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => Ticket::class,
+        ]);
+    }
+ ```
+
+#### Validation de formulaire
+
+Executer la commande pour installer Validator:
 
 ```php
-#[Route('/ticket', name: 'create_ticket')]
+composer require symfony/validator
 ```
-Notre methode index() devient createTicket()
 
-([Voir Symfony Doc](https://symfony.com/doc/current/doctrine.html#persisting-objects-to-the-database))
+On peut valider les champs en ajoutant des set de règles.
+Créer le fichier app/config/validator/validation.yaml. Les règles sont des propriétés de l'entité:
+```yaml
+App\Entity\Ticket:
+    properties:
+        label:
+            - NotBlank: ~
+        summary:
+            - NotBlank: ~
+        reporter:
+            - NotBlank: ~
+```
+
+Sinon, on peut modifier directement l'entité:
+
+```php
+// src/Entity/Task.php
+namespace App\Entity;
+
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Type;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+// ...
+class Ticket
+{
+    // ...
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addPropertyConstraint('label', new NotBlank());
+        $metadata->addPropertyConstraint('summary', new NotBlank());
+        $metadata->addPropertyConstraint('reporter', new NotBlank());
+    }
+}
+```
+
+#### Messages d'erreur de formulaire plus lisible
+On peut désactiver l'option `legacy_error_message` dans le twig.yaml pour avoir des messages par défaut plus user-friendly.
+```yaml
+# config/packages/framework.yaml
+framework:
+    form:
+        legacy_error_messages: false
+```
+
+#### Formulaire et Bootstrap
+On peut modifier le package framework.yaml pour que les formulaires symfony utilisent bootstrap 5.
+```yaml
+# config/packages/twig.yaml
+twig:
+    form_themes: ['bootstrap_5_layout.html.twig']
+```
+
+## A faire:
+**Champs "Assignee" non-obligatoire.**
+**Methodes PUT, PATCH, DELETE.**

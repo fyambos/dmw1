@@ -7,6 +7,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Form\Type\TicketType;
+use Symfony\Component\HttpFoundation\Request;
 
 #[Route('/tickets')]
 class TicketController extends AbstractController
@@ -24,8 +26,8 @@ class TicketController extends AbstractController
     }
 
     //faire un insert dans la db depuis doctrine
-    #[Route('/new', name: 'create_ticket')]
-    public function createTicket(ManagerRegistry $doctrine): Response
+    #[Route('/autoticket', name: 'create_auto_ticket')]
+    public function autoTicket(ManagerRegistry $doctrine): Response
     {
         $entityManager = $doctrine->getManager();
 
@@ -47,10 +49,43 @@ class TicketController extends AbstractController
 
         return new Response('Saved new ticket with id '.$ticket->getId());
     }
+    //form pour créer un ticket
+    #[Route('/new', name: 'new_ticket')]
+    public function createTicket(Request $request, ManagerRegistry $doctrine): Response
+    {
+        $entityManager = $doctrine->getManager();
+
+        $ticket = new Ticket();
+
+        //The form system is smart enough to access the value of the protected ticket property via the getTicket() and setTicket() methods on the Ticket class. 
+        $form = $this->createForm(TicketType::class, $ticket);
+
+        // dd('test');
+        $form->handleRequest($request);
+        //prevent user from submitting before completing the form
+        if ($form->isSubmitted() && $form->isValid()) {
+            // dd("test");
+            // $form->getData() holds the submitted values
+            // but, the original `$ticket` variable has also been updated
+            $ticket = $form->getData();
+            $ticket->setCreated(new \DateTime()); //format Y-m-d H:i:s
+
+            // tell Doctrine you want to (eventually) save the Ticket (no queries yet)
+            $entityManager->persist($ticket);
+
+            // actually executes the queries (i.e. the INSERT query)
+            $entityManager->flush();
+
+            return $this->redirectToRoute('tickets_list');
+        }
+        return $this->renderForm('tickets/new.html.twig', [
+            'form' => $form,
+        ]);
+    }
 
     //recuperer un ticket selon l'id
     #[Route('/{id}', name:"show_ticket")]
-    public function showTicket(ManagerRegistry $doctrine, int $id): Response
+    public function showTicket(int $id, ManagerRegistry $doctrine): Response
     {
 
         // if(!is_numeric($ticket)){
@@ -68,5 +103,6 @@ class TicketController extends AbstractController
         return $this->render('tickets/show.html.twig', [
             'ticket' => $ticket,
         ]);
-    }   
+    }
+    
 }

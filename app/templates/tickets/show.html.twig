@@ -3,19 +3,33 @@
 {% block title %}Ticket #{{ticket.id}}{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
-    <h1>Ticket #{{ticket.id}}</h1>
-    <ul>
-        <li><b>Label</b>:{{ticket.label}}</li>
-        <li><b>Description</b>:{{ticket.summary}}</li>
-        <li><b>Assignee</b>:{{ticket.assignee}}</li>
-        <li><b>Reporter</b>:{{ticket.reporter}}</li>
-        {# <li><b>Created</b>:{{ticket.created}}</li> #}
-    </ul>
+
+<div class="container">
+    <table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Label</th>
+            <th scope="col">Status</th>
+            <th scope="col">Description</th>
+            <th scope="col">Reporter</th>
+            <th scope="col">Assignee</th>
+            {# <th scope="col">Created</th> #}
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th scope="row">{{ ticket.id }}:</th>
+            <td>{{ ticket.label }}</td>
+            <td>{{ ticket.status }}</td>
+            <td>{{ ticket.summary }}</td>
+            <td>{{ ticket.reporter }}</td>
+            <td>{{ ticket.assignee }}</td>
+            {# <td>{{ ticket.created }}</td> #}
+
+        </tr>
+    </tbody>
+    </table>
 </div>
 {% endblock %}
