@@ -60,7 +60,6 @@ class TicketController extends AbstractController
         // }
 
         $ticket = $doctrine->getRepository(Ticket::class)->find($id);
-
         if (!$ticket) {
             throw $this->createNotFoundException(
                 'No ticket found for id '.$id
