@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ticket #{{ticket.id}}{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper">
+    <h1>Ticket #{{ticket.id}}</h1>
+    <ul>
+        <li><b>Label</b>:{{ticket.label}}</li>
+        <li><b>Description</b>:{{ticket.summary}}</li>
+        <li><b>Assignee</b>:{{ticket.assignee}}</li>
+        <li><b>Reporter</b>:{{ticket.reporter}}</li>
+        <li><b>Created</b>:{{ticket.created}}</li>
+    </ul>
+</div>
+{% endblock %}

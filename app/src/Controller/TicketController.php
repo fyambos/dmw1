@@ -23,8 +23,6 @@ class TicketController extends AbstractController
         ]);
     }
 
-
-    /*
     //faire un insert dans la db depuis doctrine
     #[Route('/new', name: 'create_ticket')]
     public function createTicket(ManagerRegistry $doctrine): Response
@@ -32,13 +30,15 @@ class TicketController extends AbstractController
         $entityManager = $doctrine->getManager();
 
         $ticket = new Ticket();
-        $ticket->setLabel('Keyboard');
-        $ticket->setReporter('Byun Baekhyun');
-        $ticket->setCreated('2022-10-10 13:39:09');
-        $ticket->setDescription('Ergonomic and stylish!');
-        $ticket->setStatus('Open');
-        $ticket->setSummary('The use operator is for giving aliases to names of classes, interfaces or other namespaces.');
-        
+        $ticket->setLabel('Storage Space');
+        $ticket->setReporter('Dean Thomas');
+        $ticket->setStatus('Closed');
+        $ticket->setSummary('If you need more than 2GB for your Jira attachments, you can upgrade at any time from the Manage Subscriptions page in your site\'s settings.');
+        $ticket->setCreated(new \DateTime()); //format Y-m-d H:i:s
+        $ticket->setAssignee('Nana Tomtom');
+        //$now = new DateTimeInterface();
+        //$ticket->setCreated($now);
+
         // tell Doctrine you want to (eventually) save the Ticket (no queries yet)
         $entityManager->persist($ticket);
 
@@ -47,5 +47,27 @@ class TicketController extends AbstractController
 
         return new Response('Saved new ticket with id '.$ticket->getId());
     }
-    */
+
+    //recuperer un ticket selon l'id
+    #[Route('/{id}', name:"show_ticket")]
+    public function showTicket(ManagerRegistry $doctrine, int $id): Response
+    {
+
+        // if(!is_numeric($ticket)){
+        //     throw $this->createNotFoundException(
+        //         'id must be an integer '.$id
+        //     );
+        // }
+
+        $ticket = $doctrine->getRepository(Ticket::class)->find($id);
+
+        if (!$ticket) {
+            throw $this->createNotFoundException(
+                'No ticket found for id '.$id
+            );
+        }
+        return $this->render('tickets/show.html.twig', [
+            'ticket' => $ticket,
+        ]);
+    }   
 }

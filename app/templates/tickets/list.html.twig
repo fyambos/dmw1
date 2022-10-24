@@ -1,3 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tickets{% endblock %}
+
+{% block body %}
+<h1>Ticket List</h1>
 {% for ticket in tickets %}
-    {{ ticket.label }}<br />
+    <b>Ticket #{{ ticket.id }}: {{ ticket.label }}</b><br />
+    <b>Description</b>: {{ ticket.summary }}<br />
+    <b>Reporter</b>: {{ ticket.reporter }}
+    {% if ticket.assignee %}
+        | <b>Asignee</b>: {{ ticket.assignee }}
+    {% endif %}
+    <br><br>
 {% endfor %}
+{% endblock %}
