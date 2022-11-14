@@ -50,7 +50,7 @@ class TicketController extends AbstractController
         return new Response('Saved new ticket with id '.$ticket->getId());
     }
     //form pour créer un ticket
-    #[Route('/new', name: 'new_ticket')]
+    #[Route('/new', name: 'create_ticket')]
     public function createTicket(Request $request, ManagerRegistry $doctrine): Response
     {
         $entityManager = $doctrine->getManager();
@@ -104,5 +104,51 @@ class TicketController extends AbstractController
             'ticket' => $ticket,
         ]);
     }
-    
+
+    #[Route('/edit/{id}', name: 'edit_ticket')]
+    public function update(Request $request, ManagerRegistry $doctrine, int $id): Response
+    {
+        $entityManager = $doctrine->getManager();
+        $ticket = $entityManager->getRepository(Ticket::class)->find($id);
+
+        if (!$ticket) {
+            throw $this->createNotFoundException(
+                'No ticket found for id '.$id
+            );
+        }
+
+       //The form system is smart enough to access the value of the protected ticket property via the getTicket() and setTicket() methods on the Ticket class. 
+       $form = $this->createForm(TicketType::class, $ticket);
+
+       $form->handleRequest($request);
+       if ($form->isSubmitted() && $form->isValid()) {
+
+           $ticket = $form->getData();
+
+           $entityManager->persist($ticket);
+
+           $entityManager->flush();
+
+           return $this->redirectToRoute('tickets_list');
+       }
+       return $this->renderForm('tickets/edit.html.twig', [
+           'form' => $form,
+       ]);
+
+    }
+
+    //supprimer un ticket selon l'id
+    #[Route('delete/{id}', name:"delete_ticket")]
+    public function deleteTicket(int $id, ManagerRegistry $doctrine): Response
+    {
+        $ticket = $doctrine->getRepository(Ticket::class)->find($id);
+        if (!$ticket) {
+            throw $this->createNotFoundException(
+                'No ticket found for id '.$id
+            );
+        }
+        return $this->render('tickets/show.html.twig', [
+            'ticket' => $ticket,
+        ]);
+    }
 }

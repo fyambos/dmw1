@@ -3,9 +3,9 @@
 {% block title %}Tickets{% endblock %}
 
 {% block body %}
-<div class="example-wrapper">
-<h1>Ticket List</h1>
 <div class="container">
+<h1>Ticket List</h1>
+<div class="tickets">
 <table class="table table-hover table-striped table-light">
   <thead class="thead-dark">
     <tr>
@@ -15,20 +15,34 @@
       <th scope="col">Description</th>
       <th scope="col">Reporter</th>
       <th scope="col">Assignee</th>
+      <th scope="col"></th>
       <th scope="col">Actions</th>
+      <th scope="col"></th>
     </tr>
   </thead>
   <tbody>
     {% for ticket in tickets %}
         <tr>
             <th scope="row">{{ ticket.id }}</th>
-            <td>{{ ticket.label }}</td>
-            <td>{{ ticket.status }}</td>
-            <td>{{ ticket.summary }}</td>
+            <td style="min-width:200px;">{{ ticket.label }}</td>
+            {% if ticket.status == "Open" %}
+              <td><button type="button" class="btn btn-success" disabled>{{ ticket.status }}</button></td>
+            {% elseif ticket.status == "Closed" %}
+              <td><button type="button" class="btn btn-dark" disabled>{{ ticket.status }}</button></td>
+            {% else %}
+              <td>{{ ticket.status }}</td>
+            {% endif %}
+            <td style="min-width:200px;">{{ ticket.summary }}</td>
             <td>{{ ticket.reporter }}</td>
             <td>{{ ticket.assignee }}</td>
             <td>
-            <a href="{{ path('show_ticket', {id: ticket.id})}}">Voir</a>
+            <a href="{{ path('show_ticket', {id: ticket.id})}}" class="btn btn-light bi bi-chevron-expand"> View </a> 
+            </td>
+            <td>
+            <a href="{{ path('edit_ticket', {id: ticket.id})}}" class="btn btn-primary bi bi-pencil-square"> Edit</a>
+            </td>
+            <td>
+            <a href="{{ path('show_ticket', {id: ticket.id})}}" class="btn btn-danger bi bi-trash-fill"> Delete</a>
             </td>
 
         </tr>

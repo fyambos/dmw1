@@ -114,8 +114,8 @@ class Ticket
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('Label', new NotBlank());
-        $metadata->addPropertyConstraint('Reporter', new NotBlank());
-        $metadata->addPropertyConstraint('Summary', new NotBlank());
+        $metadata->addPropertyConstraint('label', new NotBlank());
+        $metadata->addPropertyConstraint('reporter', new NotBlank());
+        $metadata->addPropertyConstraint('summary', new NotBlank());
     }
 }
