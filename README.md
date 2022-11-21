@@ -504,7 +504,88 @@ On peut modifier le package framework.yaml pour que les formulaires symfony util
 twig:
     form_themes: ['bootstrap_5_layout.html.twig']
 ```
+### Flash Messages
+[Doc Controller](https://symfony.com/doc/current/controller.html#flash-messages)
+
+We want to do edit/delete actions on tickets and have confirmation/error messages.
+We can do this with addFlash, in the TicketController.php in our delete method:
+```javascript
+$this->addFlash(
+                'success',
+                'The ticket was successfully deleted!'
+            );
+            return $this->redirectToRoute('tickets_list');
+
+In the list.html.twig get the flash messages (the class here is a bootstrap class):
+```
+
+```javascript
+{# read and display several types of flash messages #}
+{% for label, messages in app.flashes(['success', 'warning','error','info']) %}
+  {% for message in messages %}
+    <div class="alert alert-{{ label }}" role="alert"> 
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endfor %}
+```
+
+#### Authenficication
+
+[Doc Security](https://symfony.com/doc/current/security.html)
+```docker-compose exec php bash```
+```php bin/console make:user```
+Choix a faire:
+- User
+- yes
+- email
+- yes
+
+On créer donc une entité User, enregistré en BDD avec doctrine, avec "email" et option d'hashage de mot de passe. Cela créer aussi les champs "role", et "password".
+
+```php bin/console make:migration```
+```php bin/console doctrine:migrations:migrate```
+http://127.0.0.1:8080/ la table user est bien créer
+
+il faut activier les droits de modif sur security.yaml
+```exit```
+```sudo chown username:username app/config/packages/security.yaml```
+
+```docker-compose exec php bash```
+```composer require symfonycasts/verify-email-bundle```
+```php bin/console make:registration-form```
+
+Choix à faire:
+- yes
+- no
+- yes
+
+sur http://127.0.0.1/register on créer un user (exemple: user@test.com mot de passe 1234)
+on remarque que malgre l'op'authentification auto apres registration on est pas authe
+en effet il rest la partie auth a faire
+
+php bin/console make:auth
+Choix à faire:
+- 1
+- LoginAuthenticator
+- SecurityController
+- yes
 
 ## A faire:
 **Champs "Assignee" non-obligatoire.**
-**Methodes PUT, PATCH, DELETE.**
+**Methodes PUT, PATCH.**
+
++ partie controle d'access: add code to deny access
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+#IsGranted['ROLE_USER'] devant la route
+#IsGranted['ROLE_ADMIN']
++ role hierarchy a ajouter dans security.yaml (sous access control)
+access_control:
+    ...
+role_hierarchy:
+    ...
+
+pour droit modification utiliser chown (voir droits avec ls -l)
+
+custom nav bar suivant login ou non: access control in templates
+

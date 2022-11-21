@@ -3,6 +3,14 @@
 {% block title %}Tickets{% endblock %}
 
 {% block body %}
+{# read and display several types of flash messages #}
+{% for label, messages in app.flashes(['success', 'warning','error','info']) %}
+  {% for message in messages %}
+    <div class="alert alert-{{ label }}" role="alert">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endfor %}
 <div class="container">
 <h1>Ticket List</h1>
 <div class="tickets">
@@ -42,7 +50,7 @@
             <a href="{{ path('edit_ticket', {id: ticket.id})}}" class="btn btn-primary bi bi-pencil-square"> Edit</a>
             </td>
             <td>
-            <a href="{{ path('show_ticket', {id: ticket.id})}}" class="btn btn-danger bi bi-trash-fill"> Delete</a>
+            <a href="{{ path('delete_ticket', {id: ticket.id})}}" class="btn btn-danger bi bi-trash-fill"> Delete</a>
             </td>
 
         </tr>

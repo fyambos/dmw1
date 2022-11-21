@@ -49,6 +49,7 @@ class TicketController extends AbstractController
 
         return new Response('Saved new ticket with id '.$ticket->getId());
     }
+    
     //form pour créer un ticket
     #[Route('/new', name: 'create_ticket')]
     public function createTicket(Request $request, ManagerRegistry $doctrine): Response
@@ -124,9 +125,7 @@ class TicketController extends AbstractController
        if ($form->isSubmitted() && $form->isValid()) {
 
            $ticket = $form->getData();
-
            $entityManager->persist($ticket);
-
            $entityManager->flush();
 
            return $this->redirectToRoute('tickets_list');
@@ -141,14 +140,26 @@ class TicketController extends AbstractController
     #[Route('delete/{id}', name:"delete_ticket")]
     public function deleteTicket(int $id, ManagerRegistry $doctrine): Response
     {
+        $entityManager = $doctrine->getManager();
         $ticket = $doctrine->getRepository(Ticket::class)->find($id);
         if (!$ticket) {
-            throw $this->createNotFoundException(
-                'No ticket found for id '.$id
+            $this->addFlash(
+                'error',
+                'The ticket does not exist.'
             );
+            return $this->redirectToRoute('tickets_list');
         }
-        return $this->render('tickets/show.html.twig', [
-            'ticket' => $ticket,
-        ]);
+        else{
+            $entityManager->remove($ticket);
+            $entityManager->flush();
+            
+            $this->addFlash(
+                'success',
+                'The ticket was successfully deleted!'
+            );
+            return $this->redirectToRoute('tickets_list');
+        }
+        
+        
     }
 }
