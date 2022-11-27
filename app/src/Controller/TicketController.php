@@ -136,6 +136,23 @@ class TicketController extends AbstractController
 
     }
 
+    //confirm action
+    #[Route('confirm/{id}', name:"confirm_action")]
+    public function confirmAction(int $id, ManagerRegistry $doctrine): Response
+    {
+        $entityManager = $doctrine->getManager();
+        $ticket = $doctrine->getRepository(Ticket::class)->find($id);
+        if (!$ticket) {
+            $this->addFlash(
+                'error',
+                'The ticket does not exist.'
+            );
+            return $this->redirectToRoute('tickets_list');
+        }
+        return $this->render('tickets/confirm.html.twig', [
+            'ticket' => $ticket,
+        ]);
+    }
     //supprimer un ticket selon l'id
     #[Route('delete/{id}', name:"delete_ticket")]
     public function deleteTicket(int $id, ManagerRegistry $doctrine): Response
@@ -150,6 +167,7 @@ class TicketController extends AbstractController
             return $this->redirectToRoute('tickets_list');
         }
         else{
+            
             $entityManager->remove($ticket);
             $entityManager->flush();
             

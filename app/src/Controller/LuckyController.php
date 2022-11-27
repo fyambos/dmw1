@@ -13,8 +13,20 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class LuckyController extends AbstractController
 {
     #donner un nom à la route
+    #[Route('/number', name:"lucky_number")]
+    public function number(): Response
+    {
+        #dd($max); #die and dump
+        $number = random_int(0, 100);
+    
+        return $this->render('lucky/number.html.twig', [
+            'number' => $number,
+        ]);
+    }
+
+    #donner un nom à la route
     #[Route('/number/{max}', name:"lucky_number_max")]
-    public function number(int $max): Response
+    public function number_max(int $max): Response
     {
         #dd($max); #die and dump
         if ($max<0){

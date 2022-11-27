@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ticket #{{ticket.id}}{% endblock %}
+
+{% block body %}
+
+
+<div class="container">
+    <h2>Are you sure you want to delete the ticket? This action is irreversible.</h2><br>
+    <a href="{{ path('delete_ticket', {id: ticket.id})}}" class="btn btn-danger bi bi-trash-fill"> Yes</a>
+    <a href="{{ path('tickets_list') }}" class="btn btn-primary">No</a>
+</div>
+{% endblock %}
