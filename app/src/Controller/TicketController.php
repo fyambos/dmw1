@@ -125,6 +125,8 @@ class TicketController extends AbstractController
        if ($form->isSubmitted() && $form->isValid()) {
 
            $ticket = $form->getData();
+
+           $ticket->setReporter($this->getUser());           
            $entityManager->persist($ticket);
            $entityManager->flush();
 

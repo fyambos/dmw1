@@ -589,3 +589,9 @@ pour droit modification utiliser chown (voir droits avec ls -l)
 
 custom nav bar suivant login ou non: access control in templates
 
+---
+
+Add property Reporter and Assignee to Ticket with
+make:entity
+relation
+ManyToOne

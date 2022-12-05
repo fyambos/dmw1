@@ -17,9 +17,6 @@ class Ticket
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $reporter = null;
-
     #[ORM\Column(length: 255)]
     private ?string $label = null;
 
@@ -35,21 +32,15 @@ class Ticket
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created = null;
 
+    #[ORM\ManyToOne(inversedBy: 'tickets')]
+    private ?User $reporter = null;
+
+    #[ORM\ManyToOne(inversedBy: 'assigned_to')]
+    private ?User $Assignee = null;
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getReporter(): ?string
-    {
-        return $this->reporter;
-    }
-
-    public function setReporter(?string $reporter): self
-    {
-        $this->reporter = $reporter;
-
-        return $this;
     }
 
     public function getLabel(): ?string
@@ -99,7 +90,17 @@ class Ticket
 
         return $this;
     }
+    public function getReporter(): ?User
+    {
+        return $this->reporter;
+    }
 
+    public function setReporter(?User $reporter): self
+    {
+        $this->reporter = $reporter;
+
+        return $this;
+    }
     public function getCreated(): ?\DateTimeInterface
     {
         return $this->created;
@@ -115,7 +116,9 @@ class Ticket
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('label', new NotBlank());
-        $metadata->addPropertyConstraint('reporter', new NotBlank());
+        //$metadata->addPropertyConstraint('reporter', new NotBlank());
         $metadata->addPropertyConstraint('summary', new NotBlank());
     }
+
+
 }

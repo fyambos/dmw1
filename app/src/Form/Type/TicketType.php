@@ -1,13 +1,15 @@
 <?php
 // src/Form/Type/TicketType.php
 namespace App\Form\Type;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+use App\Entity\User;
 use App\Entity\Ticket;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -18,9 +20,16 @@ class TicketType extends AbstractType
         $builder
             ->add('label', TextType::class)
             ->add('status', TextType::class)
-            ->add('summary', TextType::class)
-            ->add('reporter', TextType::class)
-            ->add('assignee', TextType::class)
+            ->add('summary', TextareaType::class)
+            //->add('reporter', TextType::class)
+            ->add('reporter', EntityType::class, [
+                'class' => User::class,
+                'choice_label' => 'name',
+            ])
+            ->add('assignee', EntityType::class, [
+                'class' => User::class,
+                'choice_label' => 'name',
+            ])
             ->add('save', SubmitType::class)
         ;
     }

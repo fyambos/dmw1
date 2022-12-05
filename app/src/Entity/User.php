@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -28,6 +30,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
+
+    #[ORM\OneToMany(mappedBy: 'reporter', targetEntity: Ticket::class)]
+    private Collection $tickets;
+
+    #[ORM\OneToMany(mappedBy: 'Assignee', targetEntity: Ticket::class)]
+    private Collection $assigned_to;
+
+    public function __construct()
+    {
+        $this->tickets = new ArrayCollection();
+        $this->assigned_to = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -97,5 +114,77 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ticket>
+     */
+    public function getTickets(): Collection
+    {
+        return $this->tickets;
+    }
+
+    public function addTicket(Ticket $ticket): self
+    {
+        if (!$this->tickets->contains($ticket)) {
+            $this->tickets->add($ticket);
+            $ticket->setReporter($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTicket(Ticket $ticket): self
+    {
+        if ($this->tickets->removeElement($ticket)) {
+            // set the owning side to null (unless already changed)
+            if ($ticket->getReporter() === $this) {
+                $ticket->setReporter(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ticket>
+     */
+    public function getAssignedTo(): Collection
+    {
+        return $this->assigned_to;
+    }
+
+    public function addAssignedTo(Ticket $assignedTo): self
+    {
+        if (!$this->assigned_to->contains($assignedTo)) {
+            $this->assigned_to->add($assignedTo);
+            $assignedTo->setAssignee($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAssignedTo(Ticket $assignedTo): self
+    {
+        if ($this->assigned_to->removeElement($assignedTo)) {
+            // set the owning side to null (unless already changed)
+            if ($assignedTo->getAssignee() === $this) {
+                $assignedTo->setAssignee(null);
+            }
+        }
+
+        return $this;
     }
 }
