@@ -571,27 +571,51 @@ Choix à faire:
 - SecurityController
 - yes
 
-## A faire:
-**Champs "Assignee" non-obligatoire.**
-**Methodes PUT, PATCH.**
+## Controle d'accès
+Dans notre TicketControler on ajoute:
+```php
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+```
+Puis sur nos routes on ajoute l'accès que l'on veut donner. Par exemple, la page Lucky est visible pour tous. Tickets est visible pour les utilisateurs authentifiés uniquement. Certaines routes faisant partie de la page ticket ne sont accéssible que pour les admins.
 
-+ partie controle d'access: add code to deny access
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-#IsGranted['ROLE_USER'] devant la route
-#IsGranted['ROLE_ADMIN']
-+ role hierarchy a ajouter dans security.yaml (sous access control)
-access_control:
-    ...
-role_hierarchy:
-    ...
+On a donc deux roles:
+ROLE_USER et ROLE_ADMIN.
 
-pour droit modification utiliser chown (voir droits avec ls -l)
+Si l'on veut directement mettre une restriction sur une route, on peut mettre ceci devant la route au niveau du Controller. Lorsqu'un une personne non autorisée tente d'entrée dans la page, une erreur symphony AccessDeniedHttpException s'affiche par défaut. Il faut changer cette redirection par la suite.
 
-custom nav bar suivant login ou non: access control in templates
+```php
+#[IsGranted('ROLE_USER')]
+//route ici
+///...
+#[IsGranted('ROLE_ADMIN')]
+//autre route ici
+```
 
----
+On peut aussi faire une redirection à l'interieur de la route et rediriger directement, en regardant si le role de l'utilisateur
+```php
+ #[Route('/admin', name: "adminpage")]
+    public function admin(ManagerRegistry $doctrine): Response
+    {
+        $roles = $this->getUser()->getRoles();
+        
+        if(in_array('ROLE_ADMIN', $roles)){
 
-Add property Reporter and Assignee to Ticket with
-make:entity
-relation
-ManyToOne
+            return $this->render('admin/adminpage.html.twig');
+
+        }
+
+        return $this->render('bundles/TwigBundle/Exception/error404.html.twig');
+     
+    }
+```
+
+Si l'on veut le faire au niveau des template twigs on peut utiliser:
+
+```javascript
+{% if is_granted('ROLE_ADMIN') %}
+    <a href="...">Delete</a>
+{% endif %}
+```
+
+(https://github.com/fyambos/dmw1)
+(https://github.com/fyambos/dmw1/issues?q=is:open%20is:issue%20assignee:fyambos%20sort:created-asc)

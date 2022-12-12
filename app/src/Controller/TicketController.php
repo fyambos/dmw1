@@ -9,10 +9,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Form\Type\TicketType;
 use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 #[Route('/tickets')]
 class TicketController extends AbstractController
 {   
+
     #[Route('/', name: 'tickets_list')]
     public function index(ManagerRegistry $doctrine): Response
     {
@@ -182,4 +185,5 @@ class TicketController extends AbstractController
         
         
     }
+
 }
