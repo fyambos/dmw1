@@ -11,7 +11,7 @@ use App\Form\Type\TicketType;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
+#[IsGranted('ROLE_USER')]
 #[Route('/tickets')]
 class TicketController extends AbstractController
 {   
