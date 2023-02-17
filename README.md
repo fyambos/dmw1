@@ -1,2 +1,2 @@
 # dmw1
-Deploy a Symphony App
+Deploy a Symfony App
